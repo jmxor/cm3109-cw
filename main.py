@@ -67,8 +67,10 @@ def solve_simulated_annealing(
     heuristic algorithm"""
 
     # create initial ranking and calculate cost
-    x_best = x_now = list(range(len(weights)))
-    c_best = c_now = kemeny(x_now, weights)
+    x_best = list(range(len(weights)))
+    x_now = x_best.copy()
+    c_now = kemeny(x_now, weights)
+    c_best = c_now
     t = temp_initial
     num_non_improve = 0
 
