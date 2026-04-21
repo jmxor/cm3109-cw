@@ -32,7 +32,9 @@ def load_tournament(filename: str) -> tuple[list[str], list[list[int]]]:
     return participants, tournament
 
 
-def get_random_neighbour(x_now: list[int], c_now: int, weights: list[list[int]]) -> tuple[list[int], int]:
+def get_random_neighbour(
+    x_now: list[int], c_now: int, weights: list[list[int]]
+) -> tuple[list[int], int]:
     """Returns a random 2-change neighbour of the given ranking and its score"""
     x_new = x_now[:]
     c_new = c_now
@@ -57,11 +59,11 @@ def kemeny(ranking: list[int], weights: list[list[int]]) -> int:
 
 
 def solve_simulated_annealing(
-        weights: list[list[int]],
-        temp_initial: float,
-        temp_length: int,
-        cooling_rate: float,
-        max_non_improve: int
+    weights: list[list[int]],
+    temp_initial: float,
+    temp_length: int,
+    cooling_rate: float,
+    max_non_improve: int,
 ) -> tuple[list[int], int]:
     """Return the best ranking of players using the simulated annealing
     heuristic algorithm"""
@@ -117,17 +119,17 @@ def main():
         temp_initial=1,
         temp_length=2000,
         cooling_rate=0.99,
-        max_non_improve=50000
+        max_non_improve=50000,
     )
     end = time.perf_counter()
 
     # Display information
-    print('Ranking:')
+    print("Ranking:")
     for rank, index in enumerate(ranking):
-        print(f'{rank+1:2} {participants[index]}')
-    print(f'\nScore: {score}')
-    print(f'Runtime: {(end - start) * 1000}ms')
+        print(f"{rank + 1:2} {participants[index]}")
+    print(f"\nScore: {score}")
+    print(f"Runtime: {(end - start) * 1000}ms")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
