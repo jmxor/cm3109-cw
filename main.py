@@ -77,7 +77,7 @@ def solve_simulated_annealing(
     num_non_improve = 0
 
     # loop until stopping condition met
-    while 1:
+    while num_non_improve < max_non_improve:
         for i in range(temp_length):
             # generate random neighbour and cost
             x_new, c_new = get_random_neighbour(x_now, c_now, weights)
@@ -96,9 +96,11 @@ def solve_simulated_annealing(
             num_non_improve += 1
             if num_non_improve == max_non_improve:
                 # print(t)
-                return x_best, c_best
+                break
 
         t = cooling_rate * t
+
+    return x_best, c_best
 
 
 def main():
