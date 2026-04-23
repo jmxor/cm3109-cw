@@ -32,23 +32,6 @@ def load_tournament(filename: str) -> tuple[list[str], list[list[int]]]:
     return participants, tournament
 
 
-def get_random_neighbour(
-    x_now: list[int], c_now: int, weights: list[list[int]]
-) -> tuple[list[int], int]:
-    """Returns a random 2-change neighbour of the given ranking and its score"""
-    x_new = x_now[:]
-    c_new = c_now
-
-    # swap two random adjacent participants i and i+1
-    i = random.randint(0, len(x_now) - 2)
-    x_new[i], x_new[i + 1] = x_now[i + 1], x_now[i]
-
-    # calculate new score
-    c_new -= weights[x_now[i + 1]][x_now[i]]
-    c_new += weights[x_new[i + 1]][x_new[i]]
-    return x_new, c_new
-
-
 def kemeny(ranking: list[int], weights: list[list[int]]) -> int:
     """Return the kemeny score of a ranking given weights"""
     # ranking order is preserved so p1 always has a better rank than p2
@@ -69,7 +52,8 @@ def solve_simulated_annealing(
     heuristic algorithm"""
 
     # create initial ranking and calculate cost
-    x_best = list(range(len(weights)))
+    n = len(weights)
+    x_best = list(range(n))
     x_now = x_best.copy()
     c_now = kemeny(x_now, weights)
     c_best = c_now
@@ -78,24 +62,28 @@ def solve_simulated_annealing(
 
     # loop until stopping condition met
     while num_non_improve < max_non_improve:
-        for i in range(temp_length):
-            # generate random neighbour and cost
-            x_new, c_new = get_random_neighbour(x_now, c_now, weights)
-            delta_c = c_new - c_now
+        for _ in range(temp_length):
+            # Generate a random neighbouring ranking by swapping two adjacent
+            # elements and calculate the change in cost.
+            i = random.randint(0, n - 2)
+            a = x_now[i]
+            b = x_now[i + 1]
+            c_delta = weights[a][b] - weights[b][a]
 
-            # if energy decreased or random, move to x_new
-            if delta_c <= 0 or random.random() < math.exp(-delta_c / t):
-                x_now, c_now = x_new, c_new
+            # If the cost change is < 0 or random, move to new ranking
+            if c_delta <= 0 or random.random() < math.exp(-c_delta / t):
+                x_now[i], x_now[i + 1] = b, a
+                c_now += c_delta
 
                 # update x_best, c_best
                 if c_now < c_best:
-                    x_best, c_best = x_now, c_now
+                    x_best = x_now.copy()
+                    c_best = c_now
                     num_non_improve = -1
 
             # stopping condition
             num_non_improve += 1
             if num_non_improve == max_non_improve:
-                # print(t)
                 break
 
         t = cooling_rate * t
